@@ -5,7 +5,7 @@
     <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
           name="viewport">
     <meta content="ie=edge" http-equiv="X-UA-Compatible">
-    <title>Calculator fiscal</title>
+    <title>Calculator fiscal micro</title>
 
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
@@ -30,13 +30,6 @@
             <div class="form-group">
                 <label for="venit">Forma juridica</label>
                 <div class="form-check">
-                    <input checked class="form-check-input forma_juridica" id="pfa" name="forma_juridica" type="radio"
-                           value="option1">
-                    <label class="form-check-label" for="pfa">
-                        PFA (sistem real)
-                    </label>
-                </div>
-                <div class="form-check">
                     <input class="form-check-input forma_juridica" id="srl_fara" name="forma_juridica" type="radio"
                            value="srl_fara">
                     <label class="form-check-label" for="srl_fara">
@@ -50,13 +43,6 @@
                         SRL, cu angajat 2023 (angajat + 1% din venit + 8% din profit)
                     </label>
                 </div>
-                <div class="form-check">
-                    <input class="form-check-input forma_juridica" id="srl_16" name="forma_juridica" type="radio"
-                           value="srl_16">
-                    <label class="form-check-label" for="srl_16">
-                        SRL, fara angajat 2023 (16% din profit)
-                    </label>
-                </div>
             </div>
         </div>
         <hr>
@@ -64,7 +50,7 @@
             <div class="form-group">
                 <label for="venit">Platesti la stat (RON)</label>
                 <input class="form-control" id="stat" placeholder="" readonly type="number">
-                <small class="form-text text-muted" id="statHelper">Dupa venit/dupa profit</small>
+                <small class="form-text text-muted" id="statHelper">Dupa venit</small>
             </div>
             <div class="form-group">
                 <label for="venit">Platesti dupa angajare (RON)</label>
@@ -74,7 +60,7 @@
             <div class="form-group">
                 <label for="venit">Impozit pe profit (RON)</label>
                 <input class="form-control" id="impozit_profit" placeholder="" readonly type="number">
-                <small class="form-text text-muted" id="impozitHelper">Impozit pe profit</small>
+                <small class="form-text text-muted" id="impozitHelper">Impozit pe profit (cand scoti dividend)</small>
             </div>
             <div class="form-group">
                 <label for="venit">CASS dupa dividende (RON)</label>
@@ -88,9 +74,88 @@
                 <small class="form-text text-muted" id="ramaneHelper">Suma efectiva care iti ramane dupa ce ai platit
                     tot ce trebuia sa platesti. </small>
             </div>
+            <div class="form-group">
+                <label for="venit">La final ramai cu (%)</label>
+                <input class="form-control" id="ramaneprocent" placeholder="" readonly type="number">
+                <small class="form-text text-muted" id="ramaneProcentHelper">Procentul efectiv in comparatie cu venituri
+                    care iti ramane dupa ce ai platit
+                    tot ce trebuia sa platesti. </small>
+            </div>
         </div>
     </div>
 </div>
 
+<script>
+    $(document).ready(function () {
+        function calculateSRL() {
+            var venit = parseFloat($('#venit').val());
+            var cheltuieli = parseFloat($('#cheltuieli').val());
+            var treilasutadinvenit = venit * 0.03;
+            var inainteDividende = venit - treilasutadinvenit - cheltuieli;
+            var cincilasutadinprofit = inainteDividende * 0.05;
+
+            var cassDividende = 0;
+            var dividende = inainteDividende * 0.95;
+            if (dividende > 30600) {
+                cassDividende = 2550;
+            }
+
+            var totalLaStat = treilasutadinvenit + cincilasutadinprofit + cassDividende;
+            var ramane = (dividende - cassDividende).toFixed(2);
+            var ramaneProcent = (ramane * 100 / venit).toFixed(2);
+
+            $('#stat').val(treilasutadinvenit);
+            $('#angajare').val(0);
+            $('#impozit_profit').val(cincilasutadinprofit);
+            $('#cass_dividende').val(cassDividende);
+            $('#ramane').val(ramane);
+            $('#ramaneprocent').val(ramaneProcent);
+        }
+
+        function calculateSRL2023() {
+            var venit = parseFloat($('#venit').val());
+            var cheltuieli = parseFloat($('#cheltuieli').val());
+            var unulasutadinvenit = venit * 0.01;
+            var angajare = 12960;
+            var inainteDividende = venit - unulasutadinvenit - cheltuieli - angajare;
+            var optlasutadinprofit = inainteDividende * 0.08;
+
+
+            var cassDividende = 0;
+            var dividende = inainteDividende * 0.92;
+            if (dividende > 30600) {
+                cassDividende = 2550;
+            }
+
+            var totalLaStat = unulasutadinvenit + optlasutadinprofit + cassDividende;
+            var ramane = (dividende - cassDividende).toFixed(2);
+            var ramaneProcent = (ramane * 100 / venit).toFixed(2);
+
+            $('#stat').val(unulasutadinvenit);
+            $('#angajare').val(angajare);
+            $('#impozit_profit').val(optlasutadinprofit);
+            $('#cass_dividende').val(cassDividende);
+            $('#ramane').val(ramane);
+            $('#ramaneprocent').val(ramaneProcent);
+        }
+
+        $(document).on("change", "#venit,#cheltuieli,.forma_juridica", function () {
+
+            let formaJuridica = $('.forma_juridica:checked').val();
+
+            switch (formaJuridica) {
+                case "srl_fara":
+                    calculateSRL();
+                    break;
+                case "srl_cu":
+                    calculateSRL2023();
+                    break;
+                case "srl_16":
+                    calculateSRL16();
+                    break;
+            }
+        });
+    });
+</script>
 </body>
 </html>
