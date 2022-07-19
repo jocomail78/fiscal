@@ -96,12 +96,8 @@
 
             var cassDividende = 0;
             var dividende = inainteDividende * 0.95;
-            if (dividende > 15300 && dividende < 30600) {
-                cassDividende = 1530;
-            } else if (dividende > 30600) {
+            if (dividende > 30600) {
                 cassDividende = 3060;
-            } else if (dividende > 61200) {
-                cassDividende = 6120;
             }
 
             var totalLaStat = treilasutadinvenit + cincilasutadinprofit + cassDividende;
@@ -127,8 +123,12 @@
 
             var cassDividende = 0;
             var dividende = inainteDividende * 0.92;
-            if (dividende > 30600) {
-                cassDividende = 2550;
+            if (dividende > 15300 && dividende < 30600) {
+                cassDividende = 1530;
+            } else if (dividende > 30600 && dividende < 61200) {
+                cassDividende = 3060;
+            } else if (dividende > 61200) {
+                cassDividende = 6120;
             }
 
             var totalLaStat = unulasutadinvenit + optlasutadinprofit + cassDividende;
