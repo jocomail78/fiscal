@@ -66,7 +66,7 @@
                 <label for="venit">CASS dupa dividende (RON)</label>
                 <input class="form-control" id="cass_dividende" placeholder="" readonly type="number">
                 <small class="form-text text-muted" id="cassHelper">Dacă valoarea venitului net anual impozabil
-                    depășește plafonul de 12 salarii minime brute pe țară. </small>
+                    depășește plafonul de 6/12/24 salarii minime brute pe țară. </small>
             </div>
             <div class="form-group">
                 <label for="venit">La final ramai cu (RON)</label>
@@ -96,8 +96,12 @@
 
             var cassDividende = 0;
             var dividende = inainteDividende * 0.95;
-            if (dividende > 30600) {
-                cassDividende = 2550;
+            if (dividende > 15300 && dividende < 30600) {
+                cassDividende = 1530;
+            } else if (dividende > 30600) {
+                cassDividende = 3060;
+            } else if (dividende > 61200) {
+                cassDividende = 6120;
             }
 
             var totalLaStat = treilasutadinvenit + cincilasutadinprofit + cassDividende;
